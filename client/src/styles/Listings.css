@@ -1,0 +1,56 @@
+@import "./variables.css";
+@import "./breakpoints.css";
+
+.category-list {
+    padding: 50px 80px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 60px;
+  }
+  
+  @media (max-width: 768px) { 
+    .category-list {
+      padding: 50px 20px;
+    }
+  }
+  
+  .category-list .category {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: darkgrey; 
+    cursor: pointer;
+  }
+  
+  .category-list .category_icon {
+    font-size: 30px;
+  }
+  
+  .category-list .category p {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  
+  .category-list .category:hover {
+    color: pinkred; 
+  }
+  
+  .category-list .selected {
+    color: pinkred;
+  }
+  
+  .listings {
+    padding: 0 60px 120px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  @media (max-width: 1024px) { 
+    .listings {
+      padding: 0 20px 120px;
+    }
+  }
+  
