@@ -9,28 +9,30 @@ import { DateRange } from "react-date-range";
 import Loader from "../components/Loader";
 import Navbar from "../components/Navbar";
 import { useSelector } from "react-redux";
-import Footer from "../components/Footer"
+import Footer from "../components/Footer";
 
 const ListingDetails = () => {
   const [loading, setLoading] = useState(true);
-
   const { listingId } = useParams();
   const [listing, setListing] = useState(null);
 
   const getListingDetails = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3001/properties/${listingId}`,
-        {
-          method: "GET",
-        }
+        `http://localhost:3030/properties/${listingId}`,
+        { method: "GET" }
       );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch listing details");
+      }
 
       const data = await response.json();
       setListing(data);
-      setLoading(false);
     } catch (err) {
       console.log("Fetch Listing Details Failed", err.message);
+    } finally {
+      setLoading(false); // Ensure loading is set to false on completion
     }
   };
 
@@ -38,10 +40,7 @@ const ListingDetails = () => {
     getListingDetails();
   }, []);
 
-  console.log(listing)
-
-
-  /* BOOKING CALENDAR */
+  // BOOKING CALENDAR
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
@@ -51,18 +50,16 @@ const ListingDetails = () => {
   ]);
 
   const handleSelect = (ranges) => {
-    // Update the selected date range when user makes a selection
     setDateRange([ranges.selection]);
   };
 
   const start = new Date(dateRange[0].startDate);
   const end = new Date(dateRange[0].endDate);
-  const dayCount = Math.round(end - start) / (1000 * 60 * 60 * 24); // Calculate the difference in day unit
+  const dayCount = Math.round((end - start) / (1000 * 60 * 60 * 24));
 
-  /* SUBMIT BOOKING */
-  const customerId = useSelector((state) => state?.user?._id)
-
-  const navigate = useNavigate()
+  // SUBMIT BOOKING
+  const customerId = useSelector((state) => state.user?._id);
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     try {
@@ -73,48 +70,47 @@ const ListingDetails = () => {
         startDate: dateRange[0].startDate.toDateString(),
         endDate: dateRange[0].endDate.toDateString(),
         totalPrice: listing.price * dayCount,
-      }
+      };
 
-      const response = await fetch("http://localhost:3001/bookings/create", {
+      const response = await fetch("http://localhost:3030/bookings/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(bookingForm)
-      })
+        body: JSON.stringify(bookingForm),
+      });
 
       if (response.ok) {
-        navigate(`/${customerId}/trips`)
+        navigate(`/${customerId}/trips`);
       }
     } catch (err) {
-      console.log("Submit Booking Failed.", err.message)
+      console.log("Submit Booking Failed.", err.message);
     }
-  }
+  };
 
   return loading ? (
     <Loader />
   ) : (
     <>
       <Navbar />
-      
       <div className="listing-details">
         <div className="title">
-          <h1>{listing.title}</h1>
+          <h1>{listing?.title}</h1>
           <div></div>
         </div>
 
         <div className="photos">
-          {listing.listingPhotoPaths?.map((item) => (
+          {listing?.listingPhotoPaths?.map((item, index) => (
             <img
-              src={`http://localhost:3001/${item.replace("public", "")}`}
-              alt="listing photo"
+              key={index}
+              src={`http://localhost:3030/${item.replace("public", "")}`}
+              alt="listing"
             />
           ))}
         </div>
 
         <h2>
-          {listing.type} in {listing.city}, {listing.province},{" "}
-          {listing.country}
+          {listing.type} in {listing.city}, {listing.province}, {listing.country}
         </h2>
         <p>
           {listing.guestCount} guests - {listing.bedroomCount} bedroom(s) -{" "}
@@ -124,13 +120,14 @@ const ListingDetails = () => {
 
         <div className="profile">
           <img
-            src={`http://localhost:3001/${listing.creator.profileImagePath.replace(
+            src={`http://localhost:3030/${listing.creator?.profileImagePath.replace(
               "public",
               ""
             )}`}
+            alt="host"
           />
           <h3>
-            Hosted by {listing.creator.firstName} {listing.creator.lastName}
+            Hosted by {listing.creator?.firstName} {listing.creator?.lastName}
           </h3>
         </div>
         <hr />
@@ -165,21 +162,14 @@ const ListingDetails = () => {
             <h2>How long do you want to stay?</h2>
             <div className="date-range-calendar">
               <DateRange ranges={dateRange} onChange={handleSelect} />
-              {dayCount > 1 ? (
-                <h2>
-                  ${listing.price} x {dayCount} nights
-                </h2>
-              ) : (
-                <h2>
-                  ${listing.price} x {dayCount} night
-                </h2>
-              )}
-
+              <h2>
+                ${listing.price} x {dayCount} {dayCount > 1 ? "nights" : "night"}
+              </h2>
               <h2>Total price: ${listing.price * dayCount}</h2>
               <p>Start Date: {dateRange[0].startDate.toDateString()}</p>
               <p>End Date: {dateRange[0].endDate.toDateString()}</p>
 
-              <button className="button" type="submit" onClick={handleSubmit}>
+              <button className="button" type="button" onClick={handleSubmit}>
                 BOOKING
               </button>
             </div>

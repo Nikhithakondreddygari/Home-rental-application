@@ -1,7 +1,6 @@
 import "../styles/CreateListing.css";
 import Navbar from "../components/Navbar";
 import { categories, types, facilities } from "../data";
-
 import { RemoveCircleOutline, AddCircleOutline } from "@mui/icons-material";
 import variables from "../styles/variables.scss";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
@@ -10,7 +9,7 @@ import { useState } from "react";
 import { BiTrash } from "react-icons/bi";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Footer from "../components/Footer"
+import Footer from "../components/Footer";
 
 const CreateListing = () => {
   const [category, setCategory] = useState("");
@@ -94,14 +93,12 @@ const CreateListing = () => {
   };
 
   const creatorId = useSelector((state) => state.user._id);
-
   const navigate = useNavigate();
 
   const handlePost = async (e) => {
     e.preventDefault();
 
     try {
-      /* Create a new FormData onject to handle file uploads */
       const listingForm = new FormData();
       listingForm.append("creator", creatorId);
       listingForm.append("category", category);
@@ -122,13 +119,11 @@ const CreateListing = () => {
       listingForm.append("highlightDesc", formDescription.highlightDesc);
       listingForm.append("price", formDescription.price);
 
-      /* Append each selected photos to the FormData object */
       photos.forEach((photo) => {
         listingForm.append("listingPhotos", photo);
       });
 
-      /* Send a POST request to server */
-      const response = await fetch("http://localhost:3001/properties/create", {
+      const response = await fetch("http://localhost:3030/properties/create", {
         method: "POST",
         body: listingForm,
       });
@@ -140,10 +135,10 @@ const CreateListing = () => {
       console.log("Publish Listing failed", err.message);
     }
   };
+
   return (
     <>
       <Navbar />
-
       <div className="create-listing">
         <h1>Publish Your Place</h1>
         <form onSubmit={handlePost}>
@@ -154,9 +149,7 @@ const CreateListing = () => {
             <div className="category-list">
               {categories?.map((item, index) => (
                 <div
-                  className={`category ${
-                    category === item.label ? "selected" : ""
-                  }`}
+                  className={`category ${category === item.label ? "selected" : ""}`}
                   key={index}
                   onClick={() => setCategory(item.label)}
                 >
@@ -248,276 +241,186 @@ const CreateListing = () => {
               </div>
             </div>
 
-            <h3>Share some basics about your place</h3>
-            <div className="basics">
-              <div className="basic">
+            <h3>How many guests can your place accommodate?</h3>
+            <div className="half">
+              <div className="count">
                 <p>Guests</p>
-                <div className="basic_count">
-                  <RemoveCircleOutline
-                    onClick={() => {
-                      guestCount > 1 && setGuestCount(guestCount - 1);
-                    }}
-                    sx={{
-                      fontSize: "25px",
-                      cursor: "pointer",
-                      "&:hover": { color: variables.pinkred },
-                    }}
-                  />
-                  <p>{guestCount}</p>
-                  <AddCircleOutline
-                    onClick={() => {
-                      setGuestCount(guestCount + 1);
-                    }}
-                    sx={{
-                      fontSize: "25px",
-                      cursor: "pointer",
-                      "&:hover": { color: variables.pinkred },
-                    }}
-                  />
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setGuestCount(Math.max(guestCount - 1, 1))}
+                >
+                  -
+                </button>
+                <span>{guestCount}</span>
+                <button
+                  type="button"
+                  onClick={() => setGuestCount(guestCount + 1)}
+                >
+                  +
+                </button>
               </div>
-
-              <div className="basic">
+              <div className="count">
                 <p>Bedrooms</p>
-                <div className="basic_count">
-                  <RemoveCircleOutline
-                    onClick={() => {
-                      bedroomCount > 1 && setBedroomCount(bedroomCount - 1);
-                    }}
-                    sx={{
-                      fontSize: "25px",
-                      cursor: "pointer",
-                      "&:hover": { color: variables.pinkred },
-                    }}
-                  />
-                  <p>{bedroomCount}</p>
-                  <AddCircleOutline
-                    onClick={() => {
-                      setBedroomCount(bedroomCount + 1);
-                    }}
-                    sx={{
-                      fontSize: "25px",
-                      cursor: "pointer",
-                      "&:hover": { color: variables.pinkred },
-                    }}
-                  />
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setBedroomCount(Math.max(bedroomCount - 1, 1))}
+                >
+                  -
+                </button>
+                <span>{bedroomCount}</span>
+                <button
+                  type="button"
+                  onClick={() => setBedroomCount(bedroomCount + 1)}
+                >
+                  +
+                </button>
               </div>
+            </div>
 
-              <div className="basic">
+            <div className="half">
+              <div className="count">
                 <p>Beds</p>
-                <div className="basic_count">
-                  <RemoveCircleOutline
-                    onClick={() => {
-                      bedCount > 1 && setBedCount(bedCount - 1);
-                    }}
-                    sx={{
-                      fontSize: "25px",
-                      cursor: "pointer",
-                      "&:hover": { color: variables.pinkred },
-                    }}
-                  />
-                  <p>{bedCount}</p>
-                  <AddCircleOutline
-                    onClick={() => {
-                      setBedCount(bedCount + 1);
-                    }}
-                    sx={{
-                      fontSize: "25px",
-                      cursor: "pointer",
-                      "&:hover": { color: variables.pinkred },
-                    }}
-                  />
-                </div>
+                <button type="button" onClick={() => setBedCount(Math.max(bedCount - 1, 1))}>
+                  -
+                </button>
+                <span>{bedCount}</span>
+                <button type="button" onClick={() => setBedCount(bedCount + 1)}>
+                  +
+                </button>
               </div>
-
-              <div className="basic">
+              <div className="count">
                 <p>Bathrooms</p>
-                <div className="basic_count">
-                  <RemoveCircleOutline
-                    onClick={() => {
-                      bathroomCount > 1 && setBathroomCount(bathroomCount - 1);
-                    }}
-                    sx={{
-                      fontSize: "25px",
-                      cursor: "pointer",
-                      "&:hover": { color: variables.pinkred },
-                    }}
-                  />
-                  <p>{bathroomCount}</p>
-                  <AddCircleOutline
-                    onClick={() => {
-                      setBathroomCount(bathroomCount + 1);
-                    }}
-                    sx={{
-                      fontSize: "25px",
-                      cursor: "pointer",
-                      "&:hover": { color: variables.pinkred },
-                    }}
-                  />
-                </div>
+                <button type="button" onClick={() => setBathroomCount(Math.max(bathroomCount - 1, 1))}>
+                  -
+                </button>
+                <span>{bathroomCount}</span>
+                <button type="button" onClick={() => setBathroomCount(bathroomCount + 1)}>
+                  +
+                </button>
               </div>
+            </div>
+
+            <h3>Which amenities do you offer?</h3>
+            <div className="amenities-list">
+              {facilities?.map((facility, index) => (
+                <div
+                  key={index}
+                  className={`amenity ${amenities.includes(facility) ? "selected" : ""}`}
+                  onClick={() => handleSelectAmenities(facility)}
+                >
+                  {facility}
+                </div>
+              ))}
             </div>
           </div>
 
           <div className="create-listing_step2">
-            <h2>Step 2: Make your place stand out</h2>
+            <h2>Step 2: Add photos</h2>
             <hr />
-
-            <h3>Tell guests what your place has to offer</h3>
-            <div className="amenities">
-              {facilities?.map((item, index) => (
-                <div
-                  className={`facility ${
-                    amenities.includes(item.name) ? "selected" : ""
-                  }`}
-                  key={index}
-                  onClick={() => handleSelectAmenities(item.name)}
-                >
-                  <div className="facility_icon">{item.icon}</div>
-                  <p>{item.name}</p>
-                </div>
-              ))}
+            <div className="upload-container">
+              <label htmlFor="file-upload" className="upload-label">
+                <IoIosImages className="upload-icon" />
+                <p>Upload Photos</p>
+              </label>
+              <input
+                id="file-upload"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleUploadPhotos}
+                style={{ display: "none" }}
+              />
             </div>
 
-            <h3>Add some photos of your place</h3>
             <DragDropContext onDragEnd={handleDragPhoto}>
-              <Droppable droppableId="photos" direction="horizontal">
+              <Droppable droppableId="photos">
                 {(provided) => (
                   <div
-                    className="photos"
+                    className="photo-list"
                     {...provided.droppableProps}
                     ref={provided.innerRef}
                   >
-                    {photos.length < 1 && (
-                      <>
-                        <input
-                          id="image"
-                          type="file"
-                          style={{ display: "none" }}
-                          accept="image/*"
-                          onChange={handleUploadPhotos}
-                          multiple
-                        />
-                        <label htmlFor="image" className="alone">
-                          <div className="icon">
-                            <IoIosImages />
+                    {photos.map((photo, index) => (
+                      <Draggable key={index} draggableId={index.toString()} index={index}>
+                        {(provided) => (
+                          <div
+                            className="photo-item"
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            ref={provided.innerRef}
+                          >
+                            <img src={URL.createObjectURL(photo)} alt="Uploaded" />
+                            <div className="photo-actions">
+                              <RemoveCircleOutline onClick={() => handleRemovePhoto(index)} />
+                            </div>
                           </div>
-                          <p>Upload from your device</p>
-                        </label>
-                      </>
-                    )}
-
-                    {photos.length >= 1 && (
-                      <>
-                        {photos.map((photo, index) => {
-                          return (
-                            <Draggable
-                              key={index}
-                              draggableId={index.toString()}
-                              index={index}
-                            >
-                              {(provided) => (
-                                <div
-                                  className="photo"
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                >
-                                  <img
-                                    src={URL.createObjectURL(photo)}
-                                    alt="place"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRemovePhoto(index)}
-                                  >
-                                    <BiTrash />
-                                  </button>
-                                </div>
-                              )}
-                            </Draggable>
-                          );
-                        })}
-                        <input
-                          id="image"
-                          type="file"
-                          style={{ display: "none" }}
-                          accept="image/*"
-                          onChange={handleUploadPhotos}
-                          multiple
-                        />
-                        <label htmlFor="image" className="together">
-                          <div className="icon">
-                            <IoIosImages />
-                          </div>
-                          <p>Upload from your device</p>
-                        </label>
-                      </>
-                    )}
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
                   </div>
                 )}
               </Droppable>
             </DragDropContext>
+          </div>
 
-            <h3>What make your place attractive and exciting?</h3>
-            <div className="description">
+          <div className="create-listing_step3">
+            <h2>Step 3: Describe your listing</h2>
+            <hr />
+            <label>
               <p>Title</p>
               <input
                 type="text"
-                placeholder="Title"
                 name="title"
                 value={formDescription.title}
                 onChange={handleChangeDescription}
                 required
               />
+            </label>
+            <label>
               <p>Description</p>
               <textarea
-                type="text"
-                placeholder="Description"
                 name="description"
                 value={formDescription.description}
                 onChange={handleChangeDescription}
                 required
               />
+            </label>
+            <label>
               <p>Highlight</p>
               <input
                 type="text"
-                placeholder="Highlight"
                 name="highlight"
                 value={formDescription.highlight}
                 onChange={handleChangeDescription}
                 required
               />
-              <p>Highlight details</p>
-              <textarea
+            </label>
+            <label>
+              <p>Highlight Description</p>
+              <input
                 type="text"
-                placeholder="Highlight details"
                 name="highlightDesc"
                 value={formDescription.highlightDesc}
                 onChange={handleChangeDescription}
                 required
               />
-              <p>Now, set your PRICE</p>
-              <span>$</span>
+            </label>
+            <label>
+              <p>Price</p>
               <input
                 type="number"
-                placeholder="100"
                 name="price"
                 value={formDescription.price}
                 onChange={handleChangeDescription}
-                className="price"
                 required
               />
-            </div>
+            </label>
           </div>
 
-          <button className="submit_btn" type="submit">
-            CREATE YOUR LISTING
-          </button>
+          <button type="submit" className="submit-button">Publish Listing</button>
         </form>
       </div>
-
       <Footer />
     </>
   );
